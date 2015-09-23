@@ -1,6 +1,8 @@
 package com.jhcm.rest.backend.validators;
 
 import java.awt.TrayIcon.MessageType;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -25,8 +27,11 @@ public class ControllerValidationHandler {
 	private MessageDTO processFieldError(Set<ConstraintViolation<?>> errors) {
 		MessageDTO message = null;
 		if (errors != null) {
-			String msg = errors.toString();
-			message = new MessageDTO(MessageType.ERROR, msg);
+			List<PropertyValidation> l = new ArrayList<>();
+			errors.forEach(x -> l.add(new PropertyValidation(x
+					.getPropertyPath().toString(), x.getMessage())));
+			message = new MessageDTO(MessageType.ERROR, "Somo field has validation erros!");
+			message.setValidations(l);
 		}
 		return message;
 	}
