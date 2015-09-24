@@ -3,12 +3,12 @@ package com.jhcm.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Resource;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -39,8 +39,16 @@ public class RestExampleApplicationTests {
 	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private RestTemplate restTemplate = new TestRestTemplate();
 
+	private final HttpHeaders requestHeaders = new HttpHeaders();
+	private final String userEndpoint = "http://localhost:8888/users";
+
 	@Resource
 	private UserRepository ur;
+
+	@Before
+	public void setUp() {
+		requestHeaders.setContentType(MediaType.APPLICATION_JSON);
+	}
 
 	@Test
 	public void createUser() throws JsonProcessingException {
@@ -49,8 +57,6 @@ public class RestExampleApplicationTests {
 		requestBody.put("id", null);
 		requestBody.put("name", "John");
 		requestBody.put("email", "henrycm@gmail.com");
-		HttpHeaders requestHeaders = new HttpHeaders();
-		requestHeaders.setContentType(MediaType.APPLICATION_JSON);
 
 		// Creating http entity object with request body and headers
 		HttpEntity<String> httpEntity = new HttpEntity<String>(
@@ -58,7 +64,7 @@ public class RestExampleApplicationTests {
 
 		// Invoking the API
 		ResponseEntity<String> apiResponse = restTemplate.postForEntity(
-				"http://localhost:8888/users", httpEntity, String.class);
+				userEndpoint, httpEntity, String.class);
 		assertNotNull(apiResponse);
 		log.debug("{}", apiResponse);
 		assertEquals(HttpStatus.CREATED, apiResponse.getStatusCode());
@@ -72,5 +78,15 @@ public class RestExampleApplicationTests {
 
 		// Delete the data added for testing
 		ur.delete(id);
+	}
+
+	@Test
+	public void queryUser() {
+		final HashMap<String, String> urlVariables = new HashMap<String, String>();
+		urlVariables.put("page", "0");
+		ResponseEntity<String> apiResponse = restTemplate.getForEntity(
+				userEndpoint, String.class, urlVariables);
+		assertNotNull(apiResponse);
+		log.debug("{}", apiResponse);
 	}
 }
