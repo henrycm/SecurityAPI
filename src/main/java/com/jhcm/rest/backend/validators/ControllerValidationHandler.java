@@ -30,7 +30,7 @@ public class ControllerValidationHandler {
 			List<PropertyValidation> l = new ArrayList<>();
 			errors.forEach(x -> l.add(new PropertyValidation(x
 					.getPropertyPath().toString(), x.getMessage())));
-			message = new MessageDTO(MessageType.ERROR, "Somo field has validation erros!");
+			message = new MessageDTO(MessageType.ERROR, "Some fields has validation erros!");
 			message.setValidations(l);
 		}
 		return message;
