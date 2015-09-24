@@ -3,8 +3,8 @@ package com.jhcm.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.annotation.Resource;
 
@@ -26,6 +26,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jhcm.rest.backend.model.Role;
 import com.jhcm.rest.backend.model.User;
 import com.jhcm.rest.backend.repositories.UserRepository;
 
@@ -52,15 +53,10 @@ public class RestExampleApplicationTests {
 
 	@Test
 	public void createUser() throws JsonProcessingException {
-		Map<String, Object> requestBody = new HashMap<String, Object>();
-
-		requestBody.put("id", null);
-		requestBody.put("name", "John");
-		requestBody.put("email", "henrycm@gmail.com");
 
 		// Creating http entity object with request body and headers
 		HttpEntity<String> httpEntity = new HttpEntity<String>(
-				OBJECT_MAPPER.writeValueAsString(requestBody), requestHeaders);
+				OBJECT_MAPPER.writeValueAsString(buildUser()), requestHeaders);
 
 		// Invoking the API
 		ResponseEntity<String> apiResponse = restTemplate.postForEntity(
@@ -76,17 +72,26 @@ public class RestExampleApplicationTests {
 		User u = ur.findOne(id);
 		assertEquals("John", u.getName());
 
+		queryUser();
 		// Delete the data added for testing
 		ur.delete(id);
 	}
 
-	@Test
 	public void queryUser() {
 		final HashMap<String, String> urlVariables = new HashMap<String, String>();
 		urlVariables.put("page", "0");
 		ResponseEntity<String> apiResponse = restTemplate.getForEntity(
-				userEndpoint, String.class, urlVariables);
+				userEndpoint + "/1", String.class);
 		assertNotNull(apiResponse);
 		log.debug("{}", apiResponse);
+	}
+
+	private User buildUser() {
+		User u = new User();
+		u.setId(1L);
+		u.setName("John");
+		u.setEmail("henrycm@gmail.com");
+		u.setRoles(Arrays.asList(new Role[] { new Role("r1", "Role1") }));
+		return u;
 	}
 }

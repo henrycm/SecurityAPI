@@ -2,13 +2,15 @@ package com.jhcm.rest.backend.model;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -17,7 +19,7 @@ public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@NotNull
 	private Long id;
 
 	@NotEmpty(message = "{user.email.error}")
@@ -25,6 +27,16 @@ public class User implements Serializable {
 	@NotEmpty
 	private String name;
 	private Date lastUpdate;
+	@ManyToMany(cascade = CascadeType.ALL)
+	private List<Role> roles;
+
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
 
 	public String getEmail() {
 		return email;
