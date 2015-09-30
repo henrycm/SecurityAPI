@@ -3,7 +3,6 @@ package com.jhcm.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import javax.annotation.Resource;
@@ -16,7 +15,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
 import org.springframework.boot.test.WebIntegrationTest;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -26,7 +24,6 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.jhcm.rest.backend.model.Role;
 import com.jhcm.rest.backend.model.User;
 import com.jhcm.rest.backend.repositories.UserRepository;
 
@@ -41,7 +38,7 @@ public class RestExampleApplicationTests {
 	private RestTemplate restTemplate = new TestRestTemplate();
 
 	private final HttpHeaders requestHeaders = new HttpHeaders();
-	private final String userEndpoint = "http://localhost:8888/users";
+	private final String userEndpoint = "http://localhost:8888/users/";
 
 	@Resource
 	private UserRepository ur;
@@ -54,27 +51,20 @@ public class RestExampleApplicationTests {
 	@Test
 	public void createUser() throws JsonProcessingException {
 
-		// Creating http entity object with request body and headers
-		HttpEntity<String> httpEntity = new HttpEntity<String>(
-				OBJECT_MAPPER.writeValueAsString(buildUser()), requestHeaders);
-
-		// Invoking the API
-		ResponseEntity<String> apiResponse = restTemplate.postForEntity(
-				userEndpoint, httpEntity, String.class);
-		assertNotNull(apiResponse);
-		log.debug("{}", apiResponse);
-		assertEquals(HttpStatus.CREATED, apiResponse.getStatusCode());
-		// Asserting the response of the API.
+		User u = createUser(buildUser());
 		long id = 1;
-
-		// Fetching the Book details directly from the DB to verify the API
-		// succeeded
-		User u = ur.findOne(id);
+		
+		u = getUser(id);
 		assertEquals("John", u.getName());
 
+		u.setEmail("henrycm@gmail.com.ca");
+		update(u);
+
+		u = getUser(u.getId());
+
 		queryUser();
-		// Delete the data added for testing
-		ur.delete(id);
+
+		deleteUser(u.getId());
 	}
 
 	public void queryUser() {
@@ -91,7 +81,30 @@ public class RestExampleApplicationTests {
 		u.setId(1L);
 		u.setName("John");
 		u.setEmail("henrycm@gmail.com");
-		u.setRoles(Arrays.asList(new Role[] { new Role("r1", "Role1") }));
+		//u.setRoles(Arrays.asList(new Role[] { new Role("r1", "Role1") }));
 		return u;
 	}
+
+	public User createUser(final User u) {
+		ResponseEntity<User> ru = this.restTemplate.postForEntity(userEndpoint,
+				u, User.class);
+		assertEquals(HttpStatus.CREATED, ru.getStatusCode());
+		return ru.getBody();
+	}
+
+	private User getUser(long id) {
+		ResponseEntity<User> ru = restTemplate.getForEntity(userEndpoint
+				+ "{id}", User.class, id);
+		assertEquals(HttpStatus.OK, ru.getStatusCode());
+		return ru.getBody();
+	}
+
+	private void update(User u) {
+		this.restTemplate.put(userEndpoint + "{id}", u, u.getId());
+	}
+
+	public void deleteUser(final long id) {
+		this.restTemplate.delete(userEndpoint + "{id}", id);
+	}
+
 }

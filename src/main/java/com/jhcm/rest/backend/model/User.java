@@ -8,11 +8,11 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.annotation.Version;
 
 @Entity
 public class User implements Serializable {
@@ -22,13 +22,26 @@ public class User implements Serializable {
 	@NotNull
 	private Long id;
 
+	@Version
+	private Long version = 0L;
+
 	@NotEmpty(message = "{user.email.error}")
 	private String email;
 	@NotEmpty
 	private String name;
+
+	@LastModifiedDate
 	private Date lastUpdate;
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<Role> roles;
+
+	public Long getVersion() {
+		return version;
+	}
+
+	public void setVersion(Long version) {
+		this.version = version;
+	}
 
 	public List<Role> getRoles() {
 		return roles;
@@ -74,11 +87,4 @@ public class User implements Serializable {
 	public void setLastUpdate(Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
 	}
-
-	@PrePersist
-	@PreUpdate
-	void onPersist() {
-		setLastUpdate(new Date());
-	}
-
 }
