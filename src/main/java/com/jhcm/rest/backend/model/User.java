@@ -8,11 +8,11 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.Version;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.annotation.Version;
 
 @Entity
 public class User implements Serializable {
@@ -65,11 +65,6 @@ public class User implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	@Override
-	public String toString() {
-		return "[email:" + this.getEmail() + ", name:" + this.getName() + "]";
 	}
 
 	public Long getId() {

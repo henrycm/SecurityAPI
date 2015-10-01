@@ -6,35 +6,37 @@ import static org.junit.Assert.assertNotNull;
 import java.util.HashMap;
 
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.test.IntegrationTest;
 import org.springframework.boot.test.SpringApplicationConfiguration;
 import org.springframework.boot.test.TestRestTemplate;
-import org.springframework.boot.test.WebIntegrationTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jhcm.rest.backend.model.User;
 import com.jhcm.rest.backend.repositories.UserRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(classes = RestExampleApplication.class)
-@WebIntegrationTest
+@WebAppConfiguration
+@IntegrationTest
+@Transactional
 public class RestExampleApplicationTests {
 	private final Logger log = LoggerFactory
 			.getLogger(RestExampleApplicationTests.class);
 
-	public static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 	private RestTemplate restTemplate = new TestRestTemplate();
 
 	private final HttpHeaders requestHeaders = new HttpHeaders();
@@ -53,18 +55,24 @@ public class RestExampleApplicationTests {
 
 		User u = createUser(buildUser());
 		long id = 1;
-		
 		u = getUser(id);
 		assertEquals("John", u.getName());
-
 		u.setEmail("henrycm@gmail.com.ca");
 		update(u);
-
 		u = getUser(u.getId());
-
+		assertEquals(new Long(1L), u.getVersion());
 		queryUser();
-
 		deleteUser(u.getId());
+	}
+
+	@Test
+	public void testUpdate() {
+		User u = buildUser();
+		ur.save(u);
+		u.setEmail("henrycm@gmail.com.ca");
+		u = ur.save(u);
+		u = ur.getOne(u.getId());
+		assertNotNull("LastUpdate can't be null", u.getLastUpdate());
 	}
 
 	public void queryUser() {
@@ -81,7 +89,7 @@ public class RestExampleApplicationTests {
 		u.setId(1L);
 		u.setName("John");
 		u.setEmail("henrycm@gmail.com");
-		//u.setRoles(Arrays.asList(new Role[] { new Role("r1", "Role1") }));
+		// u.setRoles(Arrays.asList(new Role[] { new Role("r1", "Role1") }));
 		return u;
 	}
 

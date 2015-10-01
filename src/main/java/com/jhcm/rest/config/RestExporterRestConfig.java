@@ -6,6 +6,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.repository.support.Repositories;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.core.event.ValidatingRepositoryEventListener;
@@ -15,6 +16,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import com.jhcm.rest.backend.model.User;
 
 @Configuration
+@EnableJpaAuditing(auditorAwareRef = "generalAuditor")
 public class RestExporterRestConfig extends
 		SpringBootRepositoryRestMvcConfiguration {
 
