@@ -32,6 +32,7 @@ public class User implements Serializable {
 
 	@LastModifiedDate
 	private Date lastUpdate;
+
 	@ManyToMany(cascade = CascadeType.ALL)
 	private List<Role> roles;
 

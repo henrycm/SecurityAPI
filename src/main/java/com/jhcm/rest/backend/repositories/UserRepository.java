@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.jhcm.rest.backend.model.User;
 
-public interface UserRepository extends JpaRepository<User, Long> {
-	User findByEmail(String email);
+public interface UserRepository extends JpaRepository<User, Long>, UserRepositoryCustom
+{
+    User findByEmail( String email );
 }

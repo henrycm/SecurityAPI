@@ -3,7 +3,9 @@ package com.jhcm.rest;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -25,7 +27,9 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jhcm.rest.backend.model.Role;
 import com.jhcm.rest.backend.model.User;
+import com.jhcm.rest.backend.repositories.RoleRepository;
 import com.jhcm.rest.backend.repositories.UserRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -33,86 +37,114 @@ import com.jhcm.rest.backend.repositories.UserRepository;
 @WebAppConfiguration
 @IntegrationTest
 @Transactional
-public class RestExampleApplicationTests {
-	private final Logger log = LoggerFactory
-			.getLogger(RestExampleApplicationTests.class);
+public class RestExampleApplicationTests
+{
+    private final Logger log = LoggerFactory
+        .getLogger( RestExampleApplicationTests.class );
 
-	private RestTemplate restTemplate = new TestRestTemplate();
+    private RestTemplate restTemplate = new TestRestTemplate();
 
-	private final HttpHeaders requestHeaders = new HttpHeaders();
-	private final String userEndpoint = "http://localhost:8888/users/";
+    private final HttpHeaders requestHeaders = new HttpHeaders();
+    private final String userEndpoint = "http://localhost:8888/users/";
 
-	@Resource
-	private UserRepository ur;
+    @Resource
+    private UserRepository ur;
 
-	@Before
-	public void setUp() {
-		requestHeaders.setContentType(MediaType.APPLICATION_JSON);
-	}
+    @Resource
+    private RoleRepository rr;
 
-	@Test
-	public void createUser() throws JsonProcessingException {
+    @Before
+    public void setUp()
+    {
+        requestHeaders.setContentType( MediaType.APPLICATION_JSON );
+    }
 
-		User u = createUser(buildUser());
-		long id = 1;
-		u = getUser(id);
-		assertEquals("John", u.getName());
-		u.setEmail("henrycm@gmail.com.ca");
-		update(u);
-		u = getUser(u.getId());
-		assertEquals(new Long(1L), u.getVersion());
-		queryUser();
-		deleteUser(u.getId());
-	}
+    @Test
+    public void createUser() throws JsonProcessingException
+    {
+        User u = createUser( buildUser() );
+        long id = 1;
+        u = getUser( id );
+        assertEquals( "John", u.getName() );
+        u.setEmail( "henrycm@gmail.com.ca" );
+        update( u );
+        u = getUser( u.getId() );
+        assertEquals( new Long( 1L ), u.getVersion() );
+        queryUser();
+        deleteUser( u.getId() );
+    }
 
-	@Test
-	public void testUpdate() {
-		User u = buildUser();
-		ur.save(u);
-		u.setEmail("henrycm@gmail.com.ca");
-		u = ur.save(u);
-		u = ur.getOne(u.getId());
-		assertNotNull("LastUpdate can't be null", u.getLastUpdate());
-	}
+    @Test
+    public void testUpdate()
+    {
+        User u = buildUser();
+        ur.save( u );
+        u.setEmail( "henrycm@gmail.com.ca" );
+        u = ur.save( u );
+        u = ur.getOne( u.getId() );
+        assertNotNull( "LastUpdate can't be null", u.getLastUpdate() );
+    }
 
-	public void queryUser() {
-		final HashMap<String, String> urlVariables = new HashMap<String, String>();
-		urlVariables.put("page", "0");
-		ResponseEntity<String> apiResponse = restTemplate.getForEntity(
-				userEndpoint + "/1", String.class);
-		assertNotNull(apiResponse);
-		log.debug("{}", apiResponse);
-	}
+    @Test
+    public void testSearchByRole()
+    {
+        Role r = new Role();
+        r.setId( "role1" );
+        r.setName( "Role1" );
+        rr.save( r );
+        User u = buildUser();
+        u.setRoles( Arrays.asList( new Role[] { r } ) );
+        ur.save( u );
 
-	private User buildUser() {
-		User u = new User();
-		u.setId(1L);
-		u.setName("John");
-		u.setEmail("henrycm@gmail.com");
-		// u.setRoles(Arrays.asList(new Role[] { new Role("r1", "Role1") }));
-		return u;
-	}
+        List<User> list = ur.findByRolesName( "Role1" );
+        assertNotNull( list );
+        assertEquals( 1, list.size() );
+    }
 
-	public User createUser(final User u) {
-		ResponseEntity<User> ru = this.restTemplate.postForEntity(userEndpoint,
-				u, User.class);
-		assertEquals(HttpStatus.CREATED, ru.getStatusCode());
-		return ru.getBody();
-	}
+    public void queryUser()
+    {
+        final HashMap<String, String> urlVariables = new HashMap<String, String>();
+        urlVariables.put( "page", "0" );
+        ResponseEntity<String> apiResponse = restTemplate.getForEntity(
+            userEndpoint + "/1", String.class );
+        assertNotNull( apiResponse );
+        log.debug( "{}", apiResponse );
+    }
 
-	private User getUser(long id) {
-		ResponseEntity<User> ru = restTemplate.getForEntity(userEndpoint
-				+ "{id}", User.class, id);
-		assertEquals(HttpStatus.OK, ru.getStatusCode());
-		return ru.getBody();
-	}
+    private User buildUser()
+    {
+        User u = new User();
+        u.setId( 1L );
+        u.setName( "John" );
+        u.setEmail( "henrycm@gmail.com" );
+        // u.setRoles(Arrays.asList(new Role[] { new Role("r1", "Role1") }));
+        return u;
+    }
 
-	private void update(User u) {
-		this.restTemplate.put(userEndpoint + "{id}", u, u.getId());
-	}
+    public User createUser( final User u )
+    {
+        ResponseEntity<User> ru = this.restTemplate.postForEntity( userEndpoint,
+            u, User.class );
+        assertEquals( HttpStatus.CREATED, ru.getStatusCode() );
+        return ru.getBody();
+    }
 
-	public void deleteUser(final long id) {
-		this.restTemplate.delete(userEndpoint + "{id}", id);
-	}
+    private User getUser( long id )
+    {
+        ResponseEntity<User> ru = restTemplate.getForEntity( userEndpoint
+            + "{id}", User.class, id );
+        assertEquals( HttpStatus.OK, ru.getStatusCode() );
+        return ru.getBody();
+    }
+
+    private void update( User u )
+    {
+        this.restTemplate.put( userEndpoint + "{id}", u, u.getId() );
+    }
+
+    public void deleteUser( final long id )
+    {
+        this.restTemplate.delete( userEndpoint + "{id}", id );
+    }
 
 }
