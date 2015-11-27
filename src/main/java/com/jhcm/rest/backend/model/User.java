@@ -15,72 +15,96 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.LastModifiedDate;
 
 @Entity
-public class User implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class User implements Serializable
+{
+    private static final long serialVersionUID = 1L;
 
-	@Id
-	@NotNull
-	private Long id;
+    public User( Long id, String email )
+    {
+        this.id = id;
+        this.email = email;
+    }
 
-	@Version
-	private Long version = 0L;
+    public User()
+    {
+    }
 
-	@NotEmpty(message = "{user.email.error}")
-	private String email;
-	@NotEmpty
-	private String name;
+    @Id
+    @NotNull
+    private Long id;
 
-	@LastModifiedDate
-	private Date lastUpdate;
+    @Version
+    @NotNull
+    private Long version = 1L;
 
-	@ManyToMany(cascade = CascadeType.ALL)
-	private List<Role> roles;
+    @NotEmpty(message = "{user.email.error}")
+    private String email;
+    @NotEmpty
+    private String name;
 
-	public Long getVersion() {
-		return version;
-	}
+    @LastModifiedDate
+    private Date lastUpdate;
 
-	public void setVersion(Long version) {
-		this.version = version;
-	}
+    @ManyToMany(cascade = CascadeType.ALL)
+    private List<Role> roles;
 
-	public List<Role> getRoles() {
-		return roles;
-	}
+    public Long getVersion()
+    {
+        return version;
+    }
 
-	public void setRoles(List<Role> roles) {
-		this.roles = roles;
-	}
+    public void setVersion( Long version )
+    {
+        this.version = version;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public List<Role> getRoles()
+    {
+        return roles;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setRoles( List<Role> roles )
+    {
+        this.roles = roles;
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getEmail()
+    {
+        return email;
+    }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    public void setEmail( String email )
+    {
+        this.email = email;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public String getName()
+    {
+        return name;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public void setName( String name )
+    {
+        this.name = name;
+    }
 
-	public Date getLastUpdate() {
-		return lastUpdate;
-	}
+    public Long getId()
+    {
+        return id;
+    }
 
-	public void setLastUpdate(Date lastUpdate) {
-		this.lastUpdate = lastUpdate;
-	}
+    public void setId( Long id )
+    {
+        this.id = id;
+    }
+
+    public Date getLastUpdate()
+    {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate( Date lastUpdate )
+    {
+        this.lastUpdate = lastUpdate;
+    }
 }

@@ -1,11 +1,10 @@
 package com.jhcm.rest;
 
+import static com.jhcm.rest.TestUtil.buildUser;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -27,7 +26,6 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jhcm.rest.backend.model.Role;
 import com.jhcm.rest.backend.model.User;
 import com.jhcm.rest.backend.repositories.RoleRepository;
 import com.jhcm.rest.backend.repositories.UserRepository;
@@ -74,33 +72,6 @@ public class RestExampleApplicationTests
         deleteUser( u.getId() );
     }
 
-    @Test
-    public void testUpdate()
-    {
-        User u = buildUser();
-        ur.save( u );
-        u.setEmail( "henrycm@gmail.com.ca" );
-        u = ur.save( u );
-        u = ur.getOne( u.getId() );
-        assertNotNull( "LastUpdate can't be null", u.getLastUpdate() );
-    }
-
-    @Test
-    public void testSearchByRole()
-    {
-        Role r = new Role();
-        r.setId( "role1" );
-        r.setName( "Role1" );
-        rr.save( r );
-        User u = buildUser();
-        u.setRoles( Arrays.asList( new Role[] { r } ) );
-        ur.save( u );
-
-        List<User> list = ur.findByRolesName( "Role1" );
-        assertNotNull( list );
-        assertEquals( 1, list.size() );
-    }
-
     public void queryUser()
     {
         final HashMap<String, String> urlVariables = new HashMap<String, String>();
@@ -109,16 +80,6 @@ public class RestExampleApplicationTests
             userEndpoint + "/1", String.class );
         assertNotNull( apiResponse );
         log.debug( "{}", apiResponse );
-    }
-
-    private User buildUser()
-    {
-        User u = new User();
-        u.setId( 1L );
-        u.setName( "John" );
-        u.setEmail( "henrycm@gmail.com" );
-        // u.setRoles(Arrays.asList(new Role[] { new Role("r1", "Role1") }));
-        return u;
     }
 
     public User createUser( final User u )
