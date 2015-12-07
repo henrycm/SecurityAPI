@@ -60,6 +60,20 @@ public class TestRepository
     }
 
     @Test
+    public void testQueryApiJoin()
+    {
+        Role r = buildRole();
+        rr.save( r );
+        User u = buildUser();
+        u.setRoles( Arrays.asList( new Role[] { r } ) );
+        ur.save( u );
+
+        List<User> list = ur.findByRolesNameQuery( "Role1" );
+        assertNotNull( list );
+        assertEquals( 1, list.size() );
+    }
+
+    @Test
     public void testSelectOnlyField()
     {
         User u = buildUser();
@@ -84,6 +98,5 @@ public class TestRepository
         u = ur.saveAndFlush( u );
         u = ur.getOne( u.getId() );
         assertEquals( new Long( 2 ), u.getVersion() );
-
     }
 }
