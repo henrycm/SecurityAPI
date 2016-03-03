@@ -42,7 +42,7 @@ public class TestRepository
         u.setEmail( "update@gmail.com.ca" );
         u = ur.saveAndFlush( u );
         u = ur.getOne( u.getId() );
-        assertNotNull( "LastUpdate can't be null", u.getLastUpdate() );
+        assertNotNull( "LastUpdate can't be null", u.getModificationTime() );
     }
 
     @Test
@@ -98,5 +98,16 @@ public class TestRepository
         u = ur.saveAndFlush( u );
         u = ur.getOne( u.getId() );
         assertEquals( new Long( 2 ), u.getVersion() );
+    }
+
+    @Test
+    public void testAuditing()
+    {
+        User u = buildUser();
+        ur.save( u );
+        u.setEmail( "update@gmail.com.ca" );
+        u = ur.saveAndFlush( u );
+        u = ur.getOne( u.getId() );
+
     }
 }

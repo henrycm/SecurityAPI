@@ -16,7 +16,7 @@ import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 import com.jhcm.rest.backend.model.User;
 
 @Configuration
-@EnableJpaAuditing(auditorAwareRef = "generalAuditor")
+@EnableJpaAuditing(auditorAwareRef = "usernameAuditorAware")
 public class RestExporterRestConfig extends RepositoryRestConfigurerAdapter
 {
     @Override
@@ -52,4 +52,5 @@ public class RestExporterRestConfig extends RepositoryRestConfigurerAdapter
         listener.addValidator( "beforeSave", validator() );
         return listener;
     }
+
 }
