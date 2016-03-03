@@ -9,12 +9,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
 @SpringBootApplication
-public class RestExampleApplication {
-    private static final Logger LOG = LoggerFactory.getLogger( RestExampleApplication.class );
+public class SecurityApplication {
+    private static final Logger LOG = LoggerFactory.getLogger( SecurityApplication.class );
 
 	public static void main(String[] args) {
 		final ApplicationContext ctx = SpringApplication.run(
-				RestExampleApplication.class, args);
+				SecurityApplication.class, args);
 
         LOG.debug( "Let's inspect the beans provided by Spring Boot:" );
 

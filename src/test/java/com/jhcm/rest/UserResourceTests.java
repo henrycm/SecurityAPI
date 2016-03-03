@@ -31,12 +31,12 @@ import com.jhcm.rest.backend.repositories.RoleRepository;
 import com.jhcm.rest.backend.repositories.UserRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = RestExampleApplication.class)
+@SpringApplicationConfiguration(classes = SecurityApplication.class)
 @WebIntegrationTest("server.port:8888")
 @Transactional
-public class RestExampleApplicationTests
+public class UserResourceTests
 {
-    private final static Logger LOG = LoggerFactory.getLogger( RestExampleApplicationTests.class );
+    private final static Logger LOG = LoggerFactory.getLogger( UserResourceTests.class );
 
     private RestTemplate restTemplate = new TestRestTemplate();
 
@@ -65,7 +65,7 @@ public class RestExampleApplicationTests
         u.setEmail( "henrycm@gmail.com.ca" );
         update( u );
         u = getUser( u.getId() );
-        assertEquals( new Long( 1L ), u.getVersion() );
+        assertEquals( new Long( 2L ), u.getVersion() );
         queryUser();
         deleteUser( u.getId() );
     }
@@ -89,24 +89,21 @@ public class RestExampleApplicationTests
     {
         final HashMap<String, String> urlVariables = new HashMap<String, String>();
         urlVariables.put( "page", "0" );
-        ResponseEntity<String> apiResponse = restTemplate.getForEntity(
-            userEndpoint + "/1", String.class );
+        ResponseEntity<String> apiResponse = restTemplate.getForEntity( userEndpoint + "/1", String.class );
         assertNotNull( apiResponse );
         LOG.debug( "{}", apiResponse );
     }
 
     public User createUser( final User u )
     {
-        ResponseEntity<User> ru = this.restTemplate.postForEntity( userEndpoint,
-            u, User.class );
+        ResponseEntity<User> ru = this.restTemplate.postForEntity( userEndpoint,            u, User.class );
         assertEquals( HttpStatus.CREATED, ru.getStatusCode() );
         return ru.getBody();
     }
 
     private User getUser( long id )
     {
-        ResponseEntity<User> ru = restTemplate.getForEntity( userEndpoint
-            + "{id}", User.class, id );
+        ResponseEntity<User> ru = restTemplate.getForEntity( userEndpoint + "{id}", User.class, id );
         assertEquals( HttpStatus.OK, ru.getStatusCode() );
         return ru.getBody();
     }

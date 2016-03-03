@@ -24,7 +24,7 @@ import com.jhcm.rest.backend.repositories.RoleRepository;
 import com.jhcm.rest.backend.repositories.UserRepository;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = RestExampleApplication.class)
+@SpringApplicationConfiguration(classes = SecurityApplication.class)
 @IntegrationTest
 @Transactional
 public class TestRepository
