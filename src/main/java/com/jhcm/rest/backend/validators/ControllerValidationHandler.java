@@ -1,9 +1,9 @@
 package com.jhcm.rest.backend.validators;
 
 import java.awt.TrayIcon.MessageType;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
@@ -24,15 +24,14 @@ public class ControllerValidationHandler {
 		return processFieldError(ex.getConstraintViolations());
 	}
 
-	private MessageDTO processFieldError(Set<ConstraintViolation<?>> errors) {
-		MessageDTO message = null;
-		if (errors != null) {
-			List<PropertyValidation> l = new ArrayList<>();
-			errors.forEach(x -> l.add(new PropertyValidation(x
-					.getPropertyPath().toString(), x.getMessage())));
-			message = new MessageDTO(MessageType.ERROR, "Some fields has validation erros!");
-			message.setValidations(l);
-		}
-		return message;
-	}
+    private MessageDTO processFieldError( Set<ConstraintViolation<?>> errors )
+    {
+        MessageDTO message = null;
+        if ( errors != null ) {
+            List<PropertyValidation> validators = errors.stream().map( e -> new PropertyValidation( e.getPropertyPath().toString(), e.getMessage() ) ).collect( Collectors.toList() );
+            message = new MessageDTO( MessageType.ERROR, "Some fields has validation erros!" );
+            message.setValidations( validators );
+        }
+        return message;
+    }
 }
